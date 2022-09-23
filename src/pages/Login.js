@@ -1,15 +1,17 @@
-import React, { useState, useEffect, useRef, useContext } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import axios from '../api/axios'
+import useAuth from '../hooks/useAuth'
 
-import AuthContext from '../context/AuthProvider'
 const LOGIN_URL = '/auth'
 
 const Login = () => {
-    const { setAuth } = useContext(AuthContext);
+    const { setAuth } = useAuth();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const from = location.state?.from?.pathname || '/'
 
-
-    const [login, setLogin] = useState({ name: "", pwd: "" })
+    const [login, setLogin] = useState({ name: "", pwd: "", roles: [2001] })
     const [errMsg, setErrMsg] = useState("")
 
 
@@ -26,35 +28,46 @@ const Login = () => {
     }
 
     const submitRegister = async (e) => {
+
         e.preventDefault()
-        try {
-            const response = await axios.post(LOGIN_URL, JSON.stringify({ userName: login.name, password: login.pwd }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
-                    withCredentials: true
-                })
-            console.log(JSON.stringify(response?.data))
+        setAuth({ name: login.name, pwd: login.pwd, roles: login.roles })
+        navigate(from, { replace: true });
 
-            const accessToken = response?.data?.accessToken;
-            const roles = response?.data?.roles;
-            const { name, pwd } = login;
-            setAuth({ name, pwd, roles, accessToken })
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////Server Logic///////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            setLogin({ name: '', pwd: '' })
-        } catch (err) {
+        // try {
+        //     const response = await axios.post(LOGIN_URL, JSON.stringify({ userName: login.name, password: login.pwd }),
+        //         {
+        //             headers: { 'Content-Type': 'application/json' },
+        //             withCredentials: true
+        //         })
+        //     console.log(JSON.stringify(response?.data))
 
-            if (!err?.response) {
-                setErrMsg('No Server Response')
-            } else if (err.response?.status === 400) {
-                setErrMsg('Missing Username or Password')
-            } else if (err.response?.status === 401) {
-                setErrMsg('Unauthorized')
+        //     const accessToken = response?.data?.accessToken;
+        //     const roles = response?.data?.roles;
+        //     const { name, pwd } = login;
+        //     setAuth({ name, pwd, roles, accessToken })
 
-            } else {
-                setErrMsg('Login Faild')
+        //     setLogin({ name: '', pwd: '' })
+        // } catch (err) {
 
-            }
-        }
+        //     if (!err?.response) {
+        //         setErrMsg('No Server Response')
+        //     } else if (err.response?.status === 400) {
+        //         setErrMsg('Missing Username or Password')
+        //     } else if (err.response?.status === 401) {
+        //         setErrMsg('Unauthorized')
+
+        //     } else {
+        //         setErrMsg('Login Faild')
+
+        //     }
+        // }
 
     }
 

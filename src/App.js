@@ -1,25 +1,40 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
+import Layout from './layout/Layout';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Notfound from './pages/Notfound';
+import PrivatePage from './pages/PrivatePage';
 import Register from './pages/Register';
-
+import RequireAuth from './components/RequireAuth';
+import Unauthorized from './pages/Unauthorized';
 
 
 
 function App() {
   return (
-    <main className='container'>
-      <Router>
-        <Routes>
+    <Routes>
+      <Route path='/' element={<Layout />}>
 
-          <Route path='/' element={<Home />} />
-          <Route path='/register' element={<Register />} />
-          <Route path='/login' element={<Login />} />
-        </Routes>
-      </Router>
+        {/* Public Routes */}
 
-    </main>
+        <Route path='/' element={<Home />} />  {/* once again the path is "/" */}
+        <Route path='/register' element={<Register />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/unauthorized' element={<Unauthorized />} />
+
+        {/* Private Routes */}
+
+        <Route element={<RequireAuth allowedRoles={[2001]} />}>
+          <Route path='/private-page' element={<PrivatePage />} />
+        </Route>
+
+        {/* Not Found */}
+
+        <Route path='*' element={<Notfound />} />
+
+      </Route>
+    </Routes>
   );
 }
 
